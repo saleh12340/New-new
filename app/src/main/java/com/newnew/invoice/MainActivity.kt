@@ -48,7 +48,7 @@ fun InvoiceApp() {
             val total = items.sumOf {
                 it.amount.toDoubleOrNull()
                     ?: ((it.qty.toDoubleOrNull() ?: 0.0) * (it.price.toDoubleOrNull() ?: 0.0))
-            )
+            }
 
             Scaffold(
                 topBar = {
