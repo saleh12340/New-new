@@ -164,7 +164,7 @@ fun Field(
         textStyle=LocalTextStyle.current.copy(fontSize=13.sp, fontWeight=FontWeight.Medium),
         keyboardOptions=KeyboardOptions(keyboardType=keyboardType),
         modifier=modifier.height(44.dp),
-        shape=RoundedCornerShape(9.dp),
+        shape=RoundedCornerShape(9.dp)
     )
 }
 
@@ -172,9 +172,11 @@ fun computed(i:InvoiceItem)=money(
     i.amount.toDoubleOrNull()
         ?: ((i.qty.toDoubleOrNull()?:0.0)*(i.price.toDoubleOrNull()?:0.0))
 )
+
 fun unit(i:InvoiceItem):String {
     val q=i.qty.toDoubleOrNull() ?: return ""
     if(q==0.0) return ""
     return money((i.amount.toDoubleOrNull() ?: ((i.price.toDoubleOrNull()?:0.0)*q))/q)
 }
+
 fun money(v:Double)=DecimalFormat("#,##0.##", DecimalFormatSymbols(Locale.US)).format(v)
