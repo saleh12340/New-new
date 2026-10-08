@@ -165,7 +165,6 @@ fun Field(
         keyboardOptions=KeyboardOptions(keyboardType=keyboardType),
         modifier=modifier.height(44.dp),
         shape=RoundedCornerShape(9.dp),
-        contentPadding=PaddingValues(horizontal=9.dp, vertical=0.dp)
     )
 }
 
