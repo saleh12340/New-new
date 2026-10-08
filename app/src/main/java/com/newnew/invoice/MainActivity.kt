@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -14,6 +15,11 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.input.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +29,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.text.DecimalFormat
+import java.util.Locale
 
 data class InvoiceItem(val name:String="", val qty:String="", val price:String="", val amount:String="")
 
@@ -39,7 +46,7 @@ fun InvoiceApp() {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
         MaterialTheme(colorScheme = lightColorScheme(primary=Color(0xFF126B45), background=Color(0xFFF4F6F5))) {
             var customer by remember { mutableStateOf("") }
-            var items by remember { mutableStateOf(listOf(InvoiceItem())) }
+            var items by remember { mutableStateOf(listOf(InvoiceItem())) }\n            var paid by remember { mutableStateOf("") }
             val total = items.sumOf { (it.amount.toDoubleOrNull() ?: ((it.qty.toDoubleOrNull() ?: 0.0)*(it.price.toDoubleOrNull() ?: 0.0))) }
             Scaffold(
                 topBar={ TopAppBar(title={Text("فاتورة بيع",fontWeight=FontWeight.Bold)},actions={IconButton({}){Icon(Icons.Default.Save,"حفظ")}}) },
@@ -64,7 +71,7 @@ fun InvoiceApp() {
                     Surface(shape=RoundedCornerShape(15.dp),color=Color.White,modifier=Modifier.fillMaxWidth()){
                         Column(Modifier.padding(11.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
                             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){Text("الإجمالي",fontWeight=FontWeight.Bold);Text(money(total),fontWeight=FontWeight.Bold,fontSize=19.sp)}
-                            Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)){Field("المدفوع",Modifier.weight(1f),"");Field("المتبقي",Modifier.weight(1f),money(total),readOnly=true)}
+                            Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(6.dp)){Field("المدفوع",Modifier.weight(1f),paid){ paid=it };Field("المتبقي",Modifier.weight(1f),money((total-(paid.toDoubleOrNull()?:0.0)).coerceAtLeast(0.0)),readOnly=true)}
                         }
                     }
                 }
@@ -77,7 +84,7 @@ fun InvoiceApp() {
 fun ItemBlock(index:Int,item:InvoiceItem,onChange:(InvoiceItem)->Unit,onDelete:()->Unit){
     Surface(shape=RoundedCornerShape(15.dp),color=Color.White,modifier=Modifier.fillMaxWidth()){
         Column(Modifier.padding(7.dp),verticalArrangement=Arrangement.spacedBy(5.dp)){
-            Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically){Text("الصنف "+(index+1),fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));IconButton(onDelete,Modifier.size(34.dp)){Icon(Icons.Default.Delete,"حذف",tint=MaterialTheme.colorScheme.error)}}
+            Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically){Text("البند "+(index+1),fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));IconButton(onDelete,Modifier.size(34.dp)){Icon(Icons.Default.Delete,"حذف",tint=MaterialTheme.colorScheme.error)}}
             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(5.dp)){
                 Field("المبلغ",Modifier.weight(1f),item.amount){onChange(item.copy(amount=it))}
                 Field("السعر",Modifier.weight(1f),item.price){onChange(item.copy(price=it))}
